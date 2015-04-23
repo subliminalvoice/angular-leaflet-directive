@@ -1,5 +1,5 @@
 /*!
-*  angular-leaflet-directive 0.7.15 2015-04-21
+*  angular-leaflet-directive 0.7.15 2015-04-23
 *  angular-leaflet-directive - An AngularJS directive to easily interact with Leaflet maps
 *  git: https://github.com/tombatossals/angular-leaflet-directive
 */
@@ -3431,12 +3431,16 @@ angular.module("leaflet-directive").directive('layers', ["$log", "$q", "leafletD
                 leafletScope.$watch('layers.baselayers', function(newBaseLayers) {
                     // Delete layers from the array
                     for (var name in leafletLayers.baselayers) {
-                        if (!isDefined(newBaseLayers[name])) {
+                        if (!isDefined(newBaseLayers[name]) || newBaseLayers[name].doRefresh) {
                             // Remove from the map if it's on it
                             if (map.hasLayer(leafletLayers.baselayers[name])) {
                                 map.removeLayer(leafletLayers.baselayers[name]);
                             }
                             delete leafletLayers.baselayers[name];
+
+                            if (newBaseLayers[name].doRefresh) {
+                                newBaseLayers[name].doRefresh = false;
+                            }
                         }
                     }
                     // add new layers
@@ -3481,13 +3485,17 @@ angular.module("leaflet-directive").directive('layers', ["$log", "$q", "leafletD
                 leafletScope.$watch('layers.overlays', function(newOverlayLayers) {
                     // Delete layers from the array
                     for (var name in leafletLayers.overlays) {
-                        if (!isDefined(newOverlayLayers[name])) {
+                        if (!isDefined(newOverlayLayers[name]) || newOverlayLayers[name].doRefresh) {
                             // Remove from the map if it's on it
                             if (map.hasLayer(leafletLayers.overlays[name])) {
                                 map.removeLayer(leafletLayers.overlays[name]);
                             }
                             // TODO: Depending on the layer type we will have to delete what's included on it
                             delete leafletLayers.overlays[name];
+
+                            if (newOverlayLayers[name].doRefresh) {
+                                newOverlayLayers[name].doRefresh = false;
+                            }
                         }
                     }
 
@@ -3977,6 +3985,9 @@ angular.module("leaflet-directive").directive('paths', ["$log", "$q", "leafletDa
                                     newPath.bindLabel(pathData.label.message, pathData.label.options);
                                 }
 
+                                //bind path events before path gets added (to also catch add event)
+                                bindPathEvents(newPath, newName, pathData, leafletScope);
+
                                 // Check if the marker should be added to a layer
                                 if (isDefined(pathData) && isDefined(pathData.layer)) {
 
@@ -4020,8 +4031,6 @@ angular.module("leaflet-directive").directive('paths', ["$log", "$q", "leafletDa
                                         setPathOptions(newPath, pathData.type, pathData);
                                     }
                                 }
-
-                                bindPathEvents(newPath, newName, pathData, leafletScope);
                             }
                         }
                     });

@@ -94,6 +94,9 @@ angular.module("leaflet-directive").directive('paths', function ($log, $q, leafl
                                     newPath.bindLabel(pathData.label.message, pathData.label.options);
                                 }
 
+                                //bind path events before path gets added (to also catch add event)
+                                bindPathEvents(newPath, newName, pathData, leafletScope);
+
                                 // Check if the marker should be added to a layer
                                 if (isDefined(pathData) && isDefined(pathData.layer)) {
 
@@ -137,8 +140,6 @@ angular.module("leaflet-directive").directive('paths', function ($log, $q, leafl
                                         setPathOptions(newPath, pathData.type, pathData);
                                     }
                                 }
-
-                                bindPathEvents(newPath, newName, pathData, leafletScope);
                             }
                         }
                     });
