@@ -1,51 +1,71 @@
-angular.module("leaflet-directive").directive('controls', function ($log, leafletHelpers) {
-    return {
-        restrict: "A",
-        scope: false,
-        replace: false,
-        require: '?^leaflet',
+angular.module('leaflet-directive').directive('controls', function($log, leafletHelpers, leafletControlHelpers) {
 
-        link: function(scope, element, attrs, controller) {
-            if(!controller) {
-                return;
+  return {
+    restrict: 'A',
+    scope: false,
+    replace: false,
+    require: '?^leaflet',
+
+    link: function(scope, element, attrs, controller) {
+      if (!controller) {
+        return;
+      }
+
+      var createControl = leafletControlHelpers.createControl;
+      var isValidControlType = leafletControlHelpers.isValidControlType;
+      var leafletScope  = controller.getLeafletScope();
+      var isDefined = leafletHelpers.isDefined;
+      var isArray = leafletHelpers.isArray;
+      var leafletControls = {};
+      var errorHeader = leafletHelpers.errorHeader + ' [Controls] ';
+
+      controller.getMap().then(function(map) {
+
+        leafletScope.$watchCollection('controls', function(newControls) {
+
+          // Delete controls from the array
+          for (var name in leafletControls) {
+            if (!isDefined(newControls[name])) {
+              if (map.hasControl(leafletControls[name])) {
+                map.removeControl(leafletControls[name]);
+              }
+
+              delete leafletControls[name];
+            }
+          }
+
+          for (var newName in newControls) {
+            var control;
+
+            var controlType = isDefined(newControls[newName].type) ? newControls[newName].type : newName;
+
+            if (!isValidControlType(controlType)) {
+              $log.error(errorHeader + ' Invalid control type: ' + controlType + '.');
+              return;
             }
 
-            var isDefined = leafletHelpers.isDefined,
-                leafletScope  = controller.getLeafletScope(),
-                controls = leafletScope.controls;
-
-            controller.getMap().then(function(map) {
-                if (isDefined(L.Control.Draw) && isDefined(controls.draw)) {
-
-                    if (!isDefined(controls.edit)) {
-                        controls.edit = { featureGroup: new L.FeatureGroup() };
-                        map.addLayer(controls.edit.featureGroup);
-                    }
-
-                    var drawControl = new L.Control.Draw(controls);
-                    map.addControl(drawControl);
+            if (controlType !== 'custom') {
+              control = createControl(controlType, newControls[newName]);
+              map.addControl(control);
+              leafletControls[newName] = control;
+            } else {
+              var customControlValue = newControls[newName];
+              if (isArray(customControlValue)) {
+                for (var i in customControlValue) {
+                  var customControl = customControlValue[i];
+                  map.addControl(customControl);
+                  leafletControls[newName] = !isDefined(leafletControls[newName]) ? [customControl] : leafletControls[newName].concat([customControl]);
                 }
+              } else {
+                map.addControl(customControlValue);
+                leafletControls[newName] = customControlValue;
+              }
+            }
+          }
 
-                if (isDefined(controls.scale)) {
-                    var scaleControl = new L.control.scale(controls.scale);
-                    map.addControl(scaleControl);
-                }
+        });
 
-                if (isDefined(controls.fullscreen)) {
-                    if (leafletHelpers.FullScreenControlPlugin.isLoaded()) {
-                        var fullscreenControl = new L.Control.Fullscreen(controls.fullscreen);
-                        map.addControl(fullscreenControl);
-                    } else {
-                        $log.error('[AngularJS - Leaflet] Fullscreen plugin is not loaded.');
-                    }
-                }
-
-                if (isDefined(controls.custom)) {
-                    for(var i in controls.custom) {
-                        map.addControl(controls.custom[i]);
-                    }
-                }
-            });
-        }
-    };
+      });
+    },
+  };
 });

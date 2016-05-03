@@ -1,111 +1,114 @@
-angular.module("leaflet-directive").directive('legend', function ($log, $http, leafletHelpers, leafletLegendHelpers) {
-        return {
-            restrict: "A",
-            scope: false,
-            replace: false,
-            require: 'leaflet',
+angular.module('leaflet-directive').directive('legend', function($log, $http, leafletHelpers, leafletLegendHelpers) {
 
-            link: function (scope, element, attrs, controller) {
+  return {
+    restrict: 'A',
+    scope: false,
+    replace: false,
+    require: 'leaflet',
 
-                var isArray = leafletHelpers.isArray,
-                    isDefined = leafletHelpers.isDefined,
-                    isFunction = leafletHelpers.isFunction,
-                    leafletScope = controller.getLeafletScope(),
-                    legend = leafletScope.legend;
+    link: function(scope, element, attrs, controller) {
 
-                var legendClass;
-                var position;
-                var leafletLegend;
-                var type;
+      var isArray = leafletHelpers.isArray;
+      var isDefined = leafletHelpers.isDefined;
+      var isFunction = leafletHelpers.isFunction;
+      var leafletScope = controller.getLeafletScope();
+      var legend = leafletScope.legend;
 
-                leafletScope.$watch('legend', function (newLegend) {
+      var legendClass;
+      var position;
+      var leafletLegend;
+      var type;
 
-                    if (isDefined(newLegend)) {
+      leafletScope.$watch('legend', function(newLegend) {
 
-                        legendClass = newLegend.legendClass ? newLegend.legendClass : "legend";
+        if (isDefined(newLegend)) {
 
-                        position = newLegend.position || 'bottomright';
+          legendClass = newLegend.legendClass ? newLegend.legendClass : 'legend';
 
-                        // default to arcgis
-                        type = newLegend.type || 'arcgis'; 
-                    }
+          position = newLegend.position || 'bottomright';
 
-                }, true);
+          // default to arcgis
+          type = newLegend.type || 'arcgis';
+        }
 
-                controller.getMap().then(function (map) {
+      }, true);
 
-                    leafletScope.$watch('legend', function (newLegend) {
+      controller.getMap().then(function(map) {
 
-                        if (!isDefined(newLegend)) {
+        leafletScope.$watch('legend', function(newLegend) {
 
-                            if (isDefined(leafletLegend)) {
-                                leafletLegend.removeFrom(map);
-                                leafletLegend= null;
-                            }
+          if (!isDefined(newLegend)) {
 
-                            return;
-                        }
-
-                        if (!isDefined(newLegend.url) && (type === 'arcgis') && (!isArray(newLegend.colors) || !isArray(newLegend.labels) || newLegend.colors.length !== newLegend.labels.length)) {
-
-                            $log.warn("[AngularJS - Leaflet] legend.colors and legend.labels must be set.");
-
-                            return;
-                        }
-
-                        if (isDefined(newLegend.url)) {
-
-                            $log.info("[AngularJS - Leaflet] loading legend service.");
-
-                            return;
-                        }
-
-                        if (isDefined(leafletLegend)) {
-                            leafletLegend.removeFrom(map);
-                            leafletLegend= null;
-                        }
-
-                        leafletLegend = L.control({
-                            position: position
-                        });
-                        if (type === 'arcgis') {
-                            leafletLegend.onAdd = leafletLegendHelpers.getOnAddArrayLegend(newLegend, legendClass);
-                        }
-                        leafletLegend.addTo(map);
-
-                    });
-
-                    leafletScope.$watch('legend.url', function (newURL) {
-
-                        if (!isDefined(newURL)) {
-                            return;
-                        }
-                        $http.get(newURL)
-                            .success(function (legendData) {
-
-                                if (isDefined(leafletLegend)) {
-
-                                    leafletLegendHelpers.updateLegend(leafletLegend.getContainer(), legendData, type, newURL);
-
-                                } else {
-
-                                    leafletLegend = L.control({
-                                        position: position
-                                    });
-                                    leafletLegend.onAdd = leafletLegendHelpers.getOnAddLegend(legendData, legendClass, type, newURL);
-                                    leafletLegend.addTo(map);
-                                }
-
-                                if (isDefined(legend.loadedData) && isFunction(legend.loadedData)) {
-                                    legend.loadedData();
-                                }
-                            })
-                            .error(function () {
-                                $log.warn('[AngularJS - Leaflet] legend.url not loaded.');
-                            });
-                    });
-
-                });
+            if (isDefined(leafletLegend)) {
+              leafletLegend.removeFrom(map);
+              leafletLegend = null;
             }
-        };
-    });
+
+            return;
+          }
+
+          if (!isDefined(newLegend.url) && (type === 'arcgis') && (!isArray(newLegend.colors) || !isArray(newLegend.labels) || newLegend.colors.length !== newLegend.labels.length)) {
+
+            $log.warn('[AngularJS - Leaflet] legend.colors and legend.labels must be set.');
+
+            return;
+          }
+
+          if (isDefined(newLegend.url)) {
+
+            $log.info('[AngularJS - Leaflet] loading legend service.');
+
+            return;
+          }
+
+          if (isDefined(leafletLegend)) {
+            leafletLegend.removeFrom(map);
+            leafletLegend = null;
+          }
+
+          leafletLegend = L.control({
+            position: position,
+          });
+          if (type === 'arcgis') {
+            leafletLegend.onAdd = leafletLegendHelpers.getOnAddArrayLegend(newLegend, legendClass);
+          }
+
+          leafletLegend.addTo(map);
+
+        });
+
+        leafletScope.$watch('legend.url', function(newURL) {
+
+          if (!isDefined(newURL)) {
+            return;
+          }
+
+          $http.get(newURL)
+                            .success(function(legendData) {
+
+                              if (isDefined(leafletLegend)) {
+
+                                leafletLegendHelpers.updateLegend(leafletLegend.getContainer(), legendData, type, newURL);
+
+                              } else {
+
+                                leafletLegend = L.control({
+                                  position: position,
+                                });
+                                leafletLegend.onAdd = leafletLegendHelpers.getOnAddLegend(legendData, legendClass, type, newURL);
+                                leafletLegend.addTo(map);
+                              }
+
+                              if (isDefined(legend.loadedData) && isFunction(legend.loadedData)) {
+                                legend.loadedData();
+                              }
+                            })
+                            .error(function() {
+                              $log.warn('[AngularJS - Leaflet] legend.url not loaded.');
+                            });
+        });
+
+      });
+    },
+  };
+});

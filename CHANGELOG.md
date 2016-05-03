@@ -1,3 +1,147 @@
+<a name"0.9.0"></a>
+### 0.9.0 (2015-10-12)
+
+#### Breaking changes
+
+* **events:** refactor(rootScope map events): If the id attribute is set for the leaflet directive then the id will be used in the rootScope leaflet events. Example: `<leaflet id="firstMap">`, Will fire  `leafletDirectiveMap.firstMap.click` ([d22b3f0](https://github.com/tombatossals/angular-leaflet-directive/commit/d22b3f0))
+
+#### Bug Fixes
+
+* **build:** Added "core" to .gitignore to avoid more "core" files inside distributed version ([2ff48c3e](https://github.com/tombatossals/angular-leaflet-directive/commit/2ff48c3e))
+
+#### Features
+
+* **Leaflet.vector-markers:** Add support for Leaflet plugin 'Leaflet.vector-markers' ([eb386a1](https://github.com/tombatossals/angular-leaflet-directive/commit/eb386a1))
+* **Nokia Maps:** Added Nokia here maps. ([83b71ef](https://github.com/tombatossals/angular-leaflet-directive/commit/83b71ef))
+
+<a name"0.8.8"></a>
+### 0.8.8 (2015-09-04)
+
+
+#### Bug Fixes
+
+* **center:**
+  * Fix bug with scope.center via @ageblade ([7e718c5f](https://github.com/tombatossals/angular-leaflet-directive/commit/7e718c5f))
+  * Fix bug with scope.center ([277ebc58](https://github.com/tombatossals/angular-leaflet-directive/commit/277ebc58))
+
+
+#### Features
+
+* **layers:** Add support for Leaflet.TileLayer.IIP ([ec0fe740](https://github.com/tombatossals/angular-leaflet-directive/commit/ec0fe740))
+* **lf-center:** lfCenter or 'lf-center' added which is a dupe of center. center to be deprecated ([06b5a3fa](https://github.com/tombatossals/angular-leaflet-directive/commit/06b5a3fa))
+
+
+#### Breaking changes
+
+* **logger:** Add new independent logger requirement to replace Angular $log. Remember to include angular-simple-logger before Angular-Leaflet from your bower assets. ([4f35bf6](https://github.com/tombatossals/angular-leaflet-directive/commit/4f35bf6))
+
+
+<a name"0.8.7"></a>
+### 0.8.7 (2015-08-26)
+
+
+#### Bug Fixes
+
+* **code:** Deleted uneeded file ([5be6c453](https://github.com/tombatossals/angular-leaflet-directive/commit/5be6c453))
+* **controls:** Solved a problem with loading custom controls, as reported by @adgoncal here: ([a1843f20](https://github.com/tombatossals/angular-leaflet-directive/commit/a1843f20))
+* **dependencies:**
+  * remove dependency font-awesome ([f735e856](https://github.com/tombatossals/angular-leaflet-directive/commit/f735e856))
+  * utfgrid now specifies main file ([79c6a252](https://github.com/tombatossals/angular-leaflet-directive/commit/79c6a252))
+* **paths:** Better log description with a path inside overlay error ([a02c3046](https://github.com/tombatossals/angular-leaflet-directive/commit/a02c3046))
+
+
+#### Features
+
+* **examples:**
+  * Added new example of loading custom controls ([979a7333](https://github.com/tombatossals/angular-leaflet-directive/commit/979a7333))
+  * Compiled the examples with the new GeoGJSON Shape Layer added by @stev-0 here: h ([1f5e86a2](https://github.com/tombatossals/angular-leaflet-directive/commit/1f5e86a2))
+
+
+<a name"0.8.6"></a>
+### 0.8.6 (2015-07-28)
+
+
+#### Bug Fixes
+
+* **dependencies:**
+  * Require any AngularJS library between the 1.x major versions ([ad7d402a](https://github.com/tombatossals/angular-leaflet-directive/commit/ad7d402a))
+  * JSDOM must be version below 4.x to be able to work with NodeJS ([45f706bb](https://github.com/tombatossals/angular-leaflet-directive/commit/45f706bb))
+  * JSDOM must be version below 4.x to be able to work with NodeJS ([575bd06f](https://github.com/tombatossals/angular-leaflet-directive/commit/575bd06f))
+* **libraries:** Updated bower.json with AngularJS latest stable version: https://github.com/tomb ([50ec972c](https://github.com/tombatossals/angular-leaflet-directive/commit/50ec972c))
+* **marker:** use correct individual isDeep watch parameter ([17fb090c](https://github.com/tombatossals/angular-leaflet-directive/commit/17fb090c))
+
+
+#### Features
+
+* **bounds:**
+  * Extracted the nominatim functionality as a service, to be able to use it from ce ([11e9e31c](https://github.com/tombatossals/angular-leaflet-directive/commit/11e9e31c))
+  * Added the nominatim address way of setting bounds, as requested by @stefan-niede ([6e16cad0](https://github.com/tombatossals/angular-leaflet-directive/commit/6e16cad0))
+* **controls:**
+  * Reworked and cleaned up "controls" code. Now is possible to add/remove controls  ([2d008cc4](https://github.com/tombatossals/angular-leaflet-directive/commit/2d008cc4))
+  * Added new example of the search-plugin ([18597cb9](https://github.com/tombatossals/angular-leaflet-directive/commit/18597cb9))
+* **examples:** Added a new example of setting bounds with Nominatim feature. ([48986290](https://github.com/tombatossals/angular-leaflet-directive/commit/48986290))
+* **layercontrol:**
+  * Add groups for layers ([6c35d448](https://github.com/tombatossals/angular-leaflet-directive/commit/6c35d448))
+  * Add group option ([93e33971](https://github.com/tombatossals/angular-leaflet-directive/commit/93e33971))
+  * New layer control ([27677059](https://github.com/tombatossals/angular-leaflet-directive/commit/27677059))
+
+
+<a name"0.8.5"></a>
+### 0.8.5 (2015-06-29)
+
+
+#### Bug Fixes
+
+* **leafletMarkersHelper, markers:** Fix updating markers and managing popups. Lots of logic for marker updating was contained in the addMarkerWatch callback. If you didn't watch individual markers, then markers weren't getting updated properly. This used to work because the directive simply replaced markers on update, but with recent refactors, this is no longer the case. The addMarkerWatch watch callback is now _updateMarker and made available to the marker directive. It is used to update markers in _addMarkers. Before this commit, _addMarkers just ignored markers that already exists, now it updates.
+We now use marker.popupOpen() to handle popup logic (when focus is set to true, ensure popup gets opened). When the popup event is fired, manageOpenPopup will be used to compile the popup if necessary.
+([360401243f3f6d645860355b2c0067db6c55218a](https://github.com/tombatossals/angular-leaflet-directive/commit/360401243f3f6d645860355b2c0067db6c55218a))
+
+* **build:** grunt-graphviz added to devDeps ([b2236acc](https://github.com/tombatossals/angular-leaflet-directive/commit/b2236acc))
+* **center:** cleanup some center code, based on this issue by @pieterjandesmedt: ([ea1d52a5](https://github.com/tombatossals/angular-leaflet-directive/commit/ea1d52a5))
+* **labels:** labels added to existing markers are now bound ([f464f9c1](https://github.com/tombatossals/angular-leaflet-directive/commit/f464f9c1))
+* **markers oldModels undefined:** - markers fix with nested logic. oldModels isDefined checks ([94429544](https://github.com/tombatossals/angular-leaflet-directive/commit/94429544))
+* **markers updates:** Marker Clean up and storage was incorrect on how it's leafletMarkers (leafletDat ([6fc72b47](https://github.com/tombatossals/angular-leaflet-directive/commit/6fc72b47))
+
+
+#### Features
+
+* **control:** Add minimap control option ([d25962d1](https://github.com/tombatossals/angular-leaflet-directive/commit/d25962d1))
+* **layers:**
+  * Add Esri heatmap layer ([8e9f7fa9](https://github.com/tombatossals/angular-leaflet-directive/commit/8e9f7fa9))
+  * Add Esri clustered layer ([103af26d](https://github.com/tombatossals/angular-leaflet-directive/commit/103af26d))
+  * Add Esri image layer ([6bad236a](https://github.com/tombatossals/angular-leaflet-directive/commit/6bad236a))
+  * Add Esri tile map layer ([831d2ae7](https://github.com/tombatossals/angular-leaflet-directive/commit/831d2ae7))
+  * Add Esri feature layer ([8e2c2c9d](https://github.com/tombatossals/angular-leaflet-directive/commit/8e2c2c9d))
+  * Add Esri basemap layer ([267f2a9d](https://github.com/tombatossals/angular-leaflet-directive/commit/267f2a9d))
+
+
+<a name"0.8.4"></a>
+### 0.8.4 (2015-06-14)
+
+
+#### Bug Fixes
+
+* **popups position markers:** POST BUILD/MERGE popups position after being compiled. Refactored open popup fun ([0b885666](https://github.com/tombatossals/angular-leaflet-directive/commit/0b885666))
+
+
+#### Features
+
+* **graphs:** architecture png graphs in dist/architecture/** ([f00fcd3d](https://github.com/tombatossals/angular-leaflet-directive/commit/f00fcd3d))
+
+
+<a name"0.8.3"></a>
+### 0.8.3 (2015-06-11)
+
+#### Bug Fixes
+* **markers dupes** - issue #766 ([2d52aad](https://github.com/tombatossals/angular-leaflet-directive/commit/2d52aad5cee82a1da3817aca48ee6dee53a946af))
+* **paths** - Fix the leafletPathEvents._bindPathEvents method that was using an old syntax for binding label events. [7aa2926](https://github.com/tombatossals/angular-leaflet-directive/commit/7aa29263ca8d8cc623090d62e52aef1c8473d579)
+
+<a name"0.8.0"></a>
+### 0.8.0 (2015-05-13)
+
+* **geojson** - event handlers changed to be consistent with markers ([816a633](https://github.com/tombatossals/angular-leaflet-directive/commit/816a633))
+* iteration preference to lodash removed and not using angular.forEach, [see](http://jsperf.com/iterators/3)
+
 <a name"0.7.13"></a>
 ### 0.7.13 (2015-04-14)
 
